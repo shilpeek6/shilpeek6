@@ -1,0 +1,46 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <cmath>
+#include <algorithm>
+
+using namespace std;
+
+vector<int> get_network_quality(vector<vector<int>>& towers, int radius) {
+    // Create a map from coordinates to signal quality.
+    map<pair<int, int>, int> network_quality;
+    for (auto& tower : towers) {
+        int x = tower[0], y = tower[1], q = tower[2];
+        for (int i = x - radius; i <= x + radius; i++) {
+            for (int j = y - radius; j <= y + radius; j++) {
+                if ((i-x)*(i-x) + (j-y)*(j-y) <= radius*radius) {
+                    network_quality[{i,j}] += q / (1 + sqrt((i-x)*(i-x) + (j-y)*(j-y)));
+                }
+            }
+        }
+    }
+
+    // Find the coordinate with the maximum signal quality.
+    int max_quality = 0;
+    int max_x = -1, max_y = -1;
+    for (auto& coord_quality : network_quality) {
+        auto& coord = coord_quality.first;
+        int quality = coord_quality.second;
+        if (quality > max_quality) {
+            max_quality = quality;
+            max_x = coord.first;
+            max_y = coord.second;
+        }
+    }
+
+    // Return the coordinates of the point with the maximum signal quality.
+    return {max_x, max_y};
+}
+
+int main() {
+    vector<vector<int>> towers = {{1,2,5},{2,1,7},{3,1,9}};
+    int radius = 2;
+    vector<int> result = get_network_quality(towers, radius);
+    cout << result[0] << ", " << result[1] << endl;  // Output: 2, 1
+    return 0;
+}
